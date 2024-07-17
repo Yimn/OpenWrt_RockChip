@@ -20,6 +20,8 @@ env:
   REPO_URL: https://github.com/DHDAXCW/lede-rockchip
   REPO_BRANCH: stable
   CONFIG_FILE: configs/lede/full.config
+  NEW_CONFIG_FILE: configs/base_config
+  PHOTONICAT_DTS: configs/rk3568-photonicat.dts
   DIY_SH: scripts/lede.sh
   KMODS_IN_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -58,6 +60,8 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
+        rm target/linux/rockchip/files/arch/arm64/boot/dts/rockchip/rk3568-photonicat.dts
+        cp $NEW_CONFIG_FILE target/linux/rockchip/files/arch/arm64/boot/dts/rockchip/rk3568-photonicat.dts
         
     - name: Update Feeds
       id: update
@@ -78,7 +82,7 @@ jobs:
     - name: Load Custom Configuration
       run: |
         [ -e files ] && mv files $OPENWRTROOT/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE $OPENWRTROOT/.config
+        [ -e $NEW_CONFIG_FILE ] && mv $NEW_CONFIG_FILE $OPENWRTROOT/.config
         chmod +x scripts/*.sh
         cd $OPENWRTROOT
         ../$DIY_SH
